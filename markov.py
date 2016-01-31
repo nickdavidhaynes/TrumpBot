@@ -1,12 +1,15 @@
 '''
-module for building, updating, and calling the encyclopedia
+module for defining a markov generator given an encyclopedia of text
 '''
+
 import pickle
 import random
 
 def create_doubles_dict(words):
 	'''
 	create (or update an existing) dictionary of word doubles
+	e.g. "Hello world, this is Nick" becomes { ['Hello':'world,'], 
+	['world,':'this'], ['this':'is'], ['is':'Nick'] }
 	'''
 	# from list of words, create a list of doubles
 	doubles_list = []
@@ -28,7 +31,9 @@ def create_doubles_dict(words):
 
 def create_triples_dict(words):
 	'''
-	create (or update an existing) dictionary of word doubles
+	create (or update an existing) dictionary of word triples
+	e.g. "Hello world, this is Nick" becomes { [('Hello', 'world,'): 'this'], 
+	[('world,','this'):'is'], [('this', 'is'):'Nick'] }
 	'''
 	# from list of words, create a list of triples
 	triples_list = []
@@ -73,6 +78,9 @@ class markov_generator(object):
 		pickle.dump(self.triples_dict, open('triples_dict.pickle','w'))
 
 	def create_words_list(self):
+		'''
+		break text in file passed to object into a list of utf-8 encoded words
+		'''
 		tmp_words = self.text.decode('utf-8').split()
 		new_words = []
 		for word in tmp_words:
@@ -82,6 +90,10 @@ class markov_generator(object):
 		return new_words
 
 	def generate_doubles(self, size=25):
+		'''
+		generate size number of new words using the doubles dictionary.
+		Can be quite nonsensical
+		'''
 		seed = random.randint(0, len(self.words)-2)
 		word1 = self.words[seed]
 		gen_words = []
@@ -92,6 +104,11 @@ class markov_generator(object):
 		return ' '.join(gen_words)
 
 	def generate_triples(self, size=25):
+		'''
+		generate size number of new words using the triples dictionary.
+		This typically gives very reasonable-sounding text, but can re-produce
+		text verbatim if the input data is not very rich.
+		'''
 		seed = random.randint(0, len(self.words)-3)
 		word1, word2 = self.words[seed], self.words[seed+1]
 		gen_words = []
@@ -102,12 +119,18 @@ class markov_generator(object):
 		return ' '.join(gen_words)
 
 	def generate_text(self, size=25, p=.2):
+		'''
+		With p probability, choose to generate text from the doubles
+		dictionary instead of the triples dictionary.
+		'''
 		seed = random.randint(0, len(self.words)-3)
 		word1, word2 = self.words[seed], self.words[seed+1]
 		gen_words = []
 		for i in range(size):
 			gen_words.append(word1)
 			try:
+				# when doubles are generated, sometimes the resulting triples
+				# aren't contained in the triples dict.
 				triple_len = len(self.triples_dict[(word1, word2)])
 			except KeyError:
 				triple_len = 0
