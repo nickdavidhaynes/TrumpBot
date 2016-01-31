@@ -2,9 +2,10 @@ import pickle
 import tweepy
 import tweetGenerator
 
-tweet = tweetGenerator.make_tweet(size=100)
+tweet = tweetGenerator.make_tweet(size=100, update=True)
+#tweet = tweetGenerator.make_tweet(size=100, update=False)
 
-credentials_path = '/home/nick/side/twitter_api/credentials.pickle'
+credentials_path = '/home/ubuntu/credentials.pickle'
 credentials = pickle.load(open(credentials_path, 'r'))
 
 auth = tweepy.OAuthHandler(credentials['CONSUMER_KEY'], credentials['CONSUMER_SECRET'])

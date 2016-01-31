@@ -2,13 +2,14 @@ import markov
 import random
 from nltk.tokenize import sent_tokenize
 
-def make_tweet(size=25):
+def make_tweet(size=25, update=False):
 	'''
 	Take generated text, turn it into something that fits into a tweet
 	'''
 	file = open('trump_raw.txt')
 	generator = markov.markov_generator(file)
-	generator.update_dicts()
+	if update == True:
+		generator.update_dicts()
 
 	# if text is too long, remove sentences one by one until it fits in a tweet
 	tweetable = False

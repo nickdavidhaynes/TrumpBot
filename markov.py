@@ -73,10 +73,10 @@ class markov_generator(object):
 		pickle.dump(self.triples_dict, open('triples_dict.pickle','w'))
 
 	def create_words_list(self):
-		tmp_words = self.text.split()
+		tmp_words = self.text.decode('utf-8').split()
 		new_words = []
 		for word in tmp_words:
-			if word == '.' or word == ' ':
+			if word == '.' or word == ' ' or word == ' .' or word == "" or word == '. ':
 				continue
 			new_words.append(word)
 		return new_words
